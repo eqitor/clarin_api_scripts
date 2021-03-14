@@ -1,4 +1,29 @@
 import requests
+from requests import Response
+
+class Task:
+
+    def __init__(self, text: str, options: str = 'any2txt|wcrft2({"guesser":false, "morfeusz2":true})'):
+        self._progress: float = 0
+        self._download_url = ""
+        self._api = TagerAPI()
+        self._task_id = self._api.start_processing(text, options).text
+
+    def is_ready(self):
+        resp = self._api.get_task_status(self._task_id)
+        if resp.json()['status'] == 'DONE':
+            self._progress = 1
+            self._download_url = resp.json()["value"][0]["fileID"]
+            return True
+        else:
+            self._progress = resp.json()["value"]
+
+    def get_progress(self) -> float:
+        return self._progress
+
+    def download_file(self):
+        return self._api.download_task_result(self._download_url)
+
 
 class TagerAPI:
     """Class providing simple connection to nlprest2 API."""
@@ -13,11 +38,11 @@ class TagerAPI:
 
         return request_response
 
-    def start_processing(self, text):
+    def start_processing(self, text, options ='any2txt|wcrft2({"guesser":false, "morfeusz2":true})') -> Response:
         """Uploads file and starts processing. Returns Response object."""
         url = r"http://ws.clarin-pl.eu/nlprest2/base/startTask"
         body = {
-            "lpmn": 'any2txt|wcrft2({"guesser":false, "morfeusz2":true})',
+            "lpmn": options,
             "text": text,
             "user": 'demo'
         }
@@ -42,7 +67,3 @@ class TagerAPI:
     def get_result_id(self, status_response):
         """Fetches processing results ID from task status response."""
         return status_response.json()["value"][0]["fileID"]
-
-
-
-
