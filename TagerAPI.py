@@ -1,8 +1,8 @@
 import requests
 from requests import Response
 
-class Task:
 
+class Task:
     def __init__(self, text: str, options: str = 'any2txt|wcrft2({"guesser":false, "morfeusz2":true})'):
         self._progress: float = 0
         self._download_url = ""
