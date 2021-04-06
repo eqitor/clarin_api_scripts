@@ -1,4 +1,4 @@
-from TagerAPI import Task
+from src.clarinAPI.TagerAPI import Task
 from time import sleep
 import pandas as pd
 
@@ -6,7 +6,6 @@ import pandas as pd
 
 
 class CorpusProcessing:
-
     def __init__(self, documents: list, options: list):
         self.documents = documents
         self.options = options
@@ -22,7 +21,6 @@ class CorpusProcessing:
                     {"doc": doc, "opt": opt, "result": result},
                     ignore_index=True)
         return self.results
-
 
     def _process_document(self, text:str, option:str) -> str:
         task = Task(text, option)
