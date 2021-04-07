@@ -9,7 +9,6 @@ class FileTask:
         self._api = FileTagerAPI()
         self._remote_filepath = self._api.upload_zip_file(file_path)
         self._options = f"filezip({self._remote_filepath})|"+options+"|dir|makezip"
-        print(self._options)
         self._task_id = self._api.start_processing(self._options).text
 
     def is_ready(self):
@@ -17,11 +16,10 @@ class FileTask:
         if resp.json()['status'] == 'DONE':
             self._progress = 1
             self._download_url = resp.json()["value"][0]["fileID"]
-            print(resp.text)
             return True
         else:
-            print(resp.text)
             self._progress = resp.json()["value"]
+            return False
 
     def get_progress(self) -> float:
         return self._progress
@@ -30,7 +28,6 @@ class FileTask:
         with open(out_file, "wb") as f:
             a = self._api.download_task_result(self._download_url)
             f.writelines(a.iter_content())
-
 
 
 class Task:
@@ -74,7 +71,6 @@ class FileTagerAPI:
             task = task.text
 
         full_url = url + task
-        print(full_url)
         request_response = requests.get(full_url, stream=True)
 
         return request_response
@@ -88,7 +84,6 @@ class FileTagerAPI:
             "lpmn": options,
             "user": 'demo'
         }
-        print(body)
         request_response = requests.post(url, json=body)
 
         return request_response
