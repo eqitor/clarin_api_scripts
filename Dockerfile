@@ -6,16 +6,20 @@ WORKDIR /app/
 
 # # copy the dependencies file to the working directory
 COPY requirements.txt .
-COPY prestart.sh .
 #
 # # install dependencies
+
 RUN pip install -r requirements.txt
 
-
+COPY prestart.sh .
 # copy the content of the local src directory to the working directory
 COPY app/ /app/
+COPY src ./src
+COPY test ./test
+
 COPY jajca.zip ./jajca.zip
 
+RUN echo $(./prestart.sh)
 
-
+EXPOSE 80
 # command to run on container start
