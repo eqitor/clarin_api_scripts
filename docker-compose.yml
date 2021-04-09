@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+
+  backend:
+    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    env_file:
+      - .env
+    environment:
+      - SERVER_NAME=${DOMAIN?Variable not set}
+      - SERVER_HOST=https://${DOMAIN?Variable not set}
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ./prestart.sh
+#    command: /start-reload.sh
+#    command: /bin/bash
+#    tty: true
+
+#  minio:
+#    image: minio/minio
+#    volumes:
+#      - ./s3:/s3
+#    ports:
+#      - "9000:9000"
+#    environment:
+#      - MINIO_ROOT_USER=minio
+#      - MINIO_ROOT_PASSWORD=minio123
+#    command: server /s3
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+#      interval: 30s
+#      timeout: 20s
+#      retries: 3
+
+volumes:
+  app-db-data:
+#  s3:
