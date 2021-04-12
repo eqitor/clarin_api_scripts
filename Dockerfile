@@ -13,13 +13,14 @@ RUN pip install -r requirements.txt
 
 COPY prestart.sh .
 # copy the content of the local src directory to the working directory
-COPY app/ /app/
-COPY src ./src
+COPY ./app /app/app
 COPY test ./test
 
 COPY example.zip ./example.zip
 
-RUN echo $(./prestart.sh)
+# RUN echo $(./prestart.sh)
 
 EXPOSE 80
 # command to run on container start
+
+ENV PYTHONPATH=/app

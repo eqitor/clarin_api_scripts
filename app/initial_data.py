@@ -1,7 +1,6 @@
 import logging
+from db.init_db import init_db
 
-# from app.db.init_db import init_db
-# from app.db.session import SessionLocal
 # from app.s3.init_minio import init_minio
 # from app.s3.client import s3client
 
@@ -11,8 +10,7 @@ logger = logging.getLogger(__name__)
 
 def init() -> None:
     # TODO: place to initialize data into database and storage
-    # db = SessionLocal()
-    # init_db(db)
+    init_db(logger)
     # try:
     #     init_minio(s3client)
     # except FileExistsError as exc:

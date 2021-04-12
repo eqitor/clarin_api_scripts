@@ -2,6 +2,7 @@ import logging
 
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
+from db.client import client
 # from app.db.session import SessionLocal
 # from app.s3.client import s3client
 
@@ -21,10 +22,10 @@ wait_seconds = 1
 def init() -> None:
     try:
         # TODO: place to initialize other services like db, storage etc.
-        # db = SessionLocal()
-        # # Try to create session to check if DB is awake
-        # db.execute("SELECT 1")
-        # logger.info("Db initialized")
+        # Try to create session to check if DB is awake
+        server_info = client.server_info()
+        logger.info(server_info)
+        logger.info("MongoDb initialized")
         # s3 = s3client
         # s3.list_buckets()
         # logger.info("Minio initialized")

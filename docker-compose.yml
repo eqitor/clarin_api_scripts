@@ -1,12 +1,11 @@
 version: "3.8"
 services:
 
-
   mongodb:
     image: mongo
     restart: always
     environment:
-      MONGO_INITDB_DATABASE: baza
+      MONGO_INITDB_DATABASE: db
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     ports:
@@ -16,6 +15,8 @@ services:
 
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    depends_on:
+      - mongodb
     env_file:
       - .env
     environment:
@@ -28,7 +29,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 80
+    command: ./prestart.sh
 #    command: /start-reload.sh
 #    command: /bin/bash
 #    stdin_open: true
