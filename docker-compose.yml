@@ -4,10 +4,12 @@ services:
   mongodb:
     image: mongo
     restart: always
+    env_file:
+      - .env
     environment:
-      MONGO_INITDB_DATABASE: db
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE?Variable not set}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME?Variable not set}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD?Variable not set}
     ports:
       - "27017:27017"
     volumes:

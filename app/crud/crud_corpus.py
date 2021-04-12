@@ -2,9 +2,10 @@ from app.models import Corpus
 from app.schemas import CorpusCreate
 from typing import Optional
 
+
 class CRUDCorpus:
 
-    def create(self, obj_in:CorpusCreate) -> Corpus:
+    def create(self, obj_in: CorpusCreate) -> Corpus:
         db_obj = Corpus(
             name=obj_in.name
         )
