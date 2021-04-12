@@ -1,14 +1,13 @@
-import pytest
 import os
 from time import sleep
-from src.clarinAPI.TagerAPI import FileTask, FileTagerAPI
+from app.clarinAPI.TagerAPI import FileTask
 
 
 #@pytest.mark.skip(reason="higher level tests already check this functionality")
 class Test_FileTask():
 
     def setup(self):
-        self.task = FileTask("jajca.zip")
+        self.task = FileTask("example.zip")
 
     def test_check_progress(self):
         result = self.task.is_ready()

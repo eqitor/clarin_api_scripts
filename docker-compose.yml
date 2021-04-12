@@ -1,6 +1,19 @@
 version: "3.8"
 services:
 
+
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: baza
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./db:/data/db
+
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     env_file:
@@ -39,4 +52,5 @@ services:
 
 volumes:
   app-db-data:
+
 #  s3:

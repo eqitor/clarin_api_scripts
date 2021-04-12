@@ -17,7 +17,7 @@ COPY app/ /app/
 COPY src ./src
 COPY test ./test
 
-COPY jajca.zip ./jajca.zip
+COPY example.zip ./example.zip
 
 RUN echo $(./prestart.sh)
 

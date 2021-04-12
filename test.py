@@ -1,7 +1,7 @@
-from src.clarinAPI.TagerAPI import FileTask
+from app.clarinAPI.TagerAPI import FileTask
 from time import sleep
 
-task = FileTask("jajca.zip")
+task = FileTask("example.zip")
 while not task.is_ready():
     print(task.get_progress())
     sleep(0.1)

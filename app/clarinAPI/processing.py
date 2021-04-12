@@ -1,4 +1,4 @@
-from src.clarinAPI.TagerAPI import Task
+from app.clarinAPI import Task
 from time import sleep
 import pandas as pd
 
