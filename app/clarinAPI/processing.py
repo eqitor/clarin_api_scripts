@@ -1,33 +1,39 @@
-from app.clarinAPI import Task
 from time import sleep
-import pandas as pd
-
-
+from app.clarinAPI.TagerAPI import FileTask
+import os
 
 
 class CorpusProcessing:
-    def __init__(self, documents: list, options: list):
-        self.documents = documents
-        self.options = options
-        self.results = pd.DataFrame(columns=["doc", "opt", "result"])
+    clarin_tools = {
+        "tager": "any2txt|wcrft2({\"guesser\":false, \"morfeusz2\":true})",
+        "ner": "any2txt|wcrft2|liner2({\"model\":\"top9\"})",
+        "termopl": "any2txt|wcrft2|dir|"
+                   "termopl2({\"mw\":true,\"sw\":\"/resources/termopl/termopl_sw.txt\","
+                   "\"cp\":\"/resources/termopl/termopl_cp.txt\"})"
+        # "topics": "any2txt|div(20000)|wcrft2|"
+        #           "fextor2({\"features\":\"base\",\"lang\":\"pl\",\"filters\":{\"base\":"
+        #           "[{\"type\":\"pos_stoplist\",\"args\":{\"stoplist\":[\"subst\"],\"excluding\":false}}]}})"
+        #           "|dir|feature2({\"filter\":{\"base\":{\"min_df\":2,\"max_df\":1,\"keep_n\":1000}}})"
+        #           "|topic3({\"no_topics\":20,\"no_passes\":30,\"method\":\"artm_bigartm\",\"alpha\":-2,\"beta\":-0.01})"
+        #           "|out(\"texts\")"
+    }
+
+    def __init__(self, corpus_id):
+        self.corpus_id = corpus_id
+        self.zip_path = os.path.join('temp', str(corpus_id) + '.zip')
+        if not os.path.isfile(self.zip_path):
+            raise FileNotFoundError("Zip file of corpus does not exist")
 
     def process_corpus(self):
-        # TODO documents moze byc zipem czy coś, trzeba dogadać
-        # TODO options to tez moze byc obiekt jakiejs klasy z opcjami ktore maja przeleciec dla dokumentow
-        for doc in self.documents:
-            for opt in self.options:
-                result = self._process_document(doc, opt)
-                self.results = self.results.append(
-                    {"doc": doc, "opt": opt, "result": result},
-                    ignore_index=True)
-        return self.results
-
-    def _process_document(self, text:str, option:str) -> str:
-        task = Task(text, option)
-        while not task.is_ready():
-            print(task.get_progress())
-            sleep(1)
-        result = task.download_file()
-        if result.status_code != 200:
-            raise ConnectionError(f"Document was not processed correctly: {result.text}")
-        return result.text
+        os.makedirs(os.path.join("temp", str(self.corpus_id)), exist_ok=True)
+        for tool in self.clarin_tools:
+            task = FileTask(self.zip_path, self.clarin_tools[tool])
+            i = 0
+            while not task.is_ready():
+                sleep(1)
+                i += 1
+                if i > 600:
+                    raise TimeoutError(f"Corpus is processing too long for clarin tool: {tool}")
+            else:
+                file = os.path.join("temp", str(self.corpus_id), tool + ".zip")
+                task.download_and_save_file(out_file=file)
