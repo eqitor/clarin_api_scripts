@@ -1,6 +1,7 @@
 from time import sleep
 from app.clarinAPI.TagerAPI import FileTask
 import os
+import asyncio
 
 
 class CorpusProcessing:
@@ -38,16 +39,17 @@ class CorpusProcessing:
         if not os.path.isfile(self.zip_path):
             raise FileNotFoundError("Zip file of corpus does not exist")
 
-    def process_corpus(self):
+    async def process_corpus(self):
         os.makedirs(os.path.join("temp", str(self.corpus_id)), exist_ok=True)
         for tool in self.clarin_tools:
             task = FileTask(self.zip_path, **self.clarin_tools[tool])
+            await task.start_task()
             i = 0
-            while not task.is_ready():
-                sleep(1)
+            while not await task.is_ready():
+                await asyncio.sleep(1)
                 i += 1
                 if i > 600:
                     raise TimeoutError(f"Corpus is processing too long for clarin tool: {tool}")
             else:
                 file = os.path.join("temp", str(self.corpus_id), tool + ".zip")
-                task.download_and_save_file(out_file=file)
+                await task.download_and_save_file(out_file=file)

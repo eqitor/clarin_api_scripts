@@ -1,18 +1,21 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from typing import Any
 from app import schemas
 from app.clarinAPI.processing import CorpusProcessing
 from time import sleep
 from random import randint
+import logging
+import asyncio
 
 router = APIRouter()
+
 
 
 @router.post("/")
 async def create_corpus(*,
                         zipfile: UploadFile = File(default="None")
                         ) -> Any:
-    id = randint(0,100000)
+    id = randint(0, 100000)
     with open(f"temp/{id}.zip", "wb") as file:
         content = await zipfile.read()
         file.write(content)
@@ -23,18 +26,7 @@ async def create_corpus(*,
 async def process_corpus(*,
                          corpus_id: int,
                          full: bool = True):
-    # task = FileTask(f"temp/{corpus_id}.zip")
-    # i = 0
-    # while not task.is_ready():
-    #     sleep(0.1)
-    #     i += 1
-    #     if i > 600:
-    #         break
-    # else:
-    #     file = f"temp/{corpus_id}_result.zip"
-    #     task.download_and_save_file(out_file=file)
-    #     return {"status": "ok"}
-    # return {"status": "error"}
     processing = CorpusProcessing(corpus_id)
-    processing.process_corpus()
+    await processing.process_corpus()
     return {"status": "ok"}
+
