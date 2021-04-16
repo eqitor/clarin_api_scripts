@@ -1,25 +1,39 @@
 import requests
 from requests import Response
-
+import logging
 
 class FileTask:
-    def __init__(self, file_path: str, options: str = 'any2txt|wcrft2({"guesser":false, "morfeusz2":true})'):
+    def __init__(self, file_path: str, option: str = 'any2txt|wcrft2({"guesser":false, "morfeusz2":true})',
+                 download_dict_list=None):
         self._progress: float = 0
         self._download_url = ""
+        if download_dict_list is None:
+            self.download_dict_list = ["value", 0, "fileID"]
+        else:
+            self.download_dict_list = download_dict_list
         self._api = FileTagerAPI()
         self._remote_filepath = self._api.upload_zip_file(file_path)
-        self._options = f"filezip({self._remote_filepath})|"+options+"|dir|makezip"
-        self._task_id = self._api.start_processing(self._options).text
+        self._option = f"filezip({self._remote_filepath})|" + option + "|dir|makezip"
+        self._task_id = self._api.start_processing(self._option).text
+        self.logger = logging.getLogger("FileTask")
 
     def is_ready(self):
         resp = self._api.get_task_status(self._task_id)
         if resp.json()['status'] == 'DONE':
             self._progress = 1
-            self._download_url = resp.json()["value"][0]["fileID"]
+            self.logger.warning(resp.json())
+            self._download_url = self._get_download_link(resp)
             return True
         else:
+            self.logger.warning(resp.json())
             self._progress = resp.json()["value"]
             return False
+
+    def _get_download_link(self, response: Response):
+        result = response.json()
+        for key in self.download_dict_list:
+            result = result[key]
+        return result
 
     def get_progress(self) -> float:
         return self._progress
