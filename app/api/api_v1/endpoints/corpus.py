@@ -1,31 +1,38 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form
 from typing import Any
-from app import schemas
+from app import schemas,crud
 from app.clarinAPI.processing import CorpusProcessing
-from time import sleep
+from aiofile import async_open
 from random import randint
 import logging
-import asyncio
 
 router = APIRouter()
 
 
-
-@router.post("/")
+@router.post("/", response_model=schemas.Corpus)
 async def create_corpus(*,
-                        zipfile: UploadFile = File(default="None")
-                        ) -> Any:
-    id = randint(0, 100000)
-    with open(f"temp/{id}.zip", "wb") as file:
+                        zipfile: UploadFile = File(default=None),
+                        corpus_name: str = Form(default="Korpus")
+                        ) -> schemas.Corpus:
+    corpus_in = schemas.CorpusCreate(name=corpus_name)
+    corpus_out = crud.corpus.create(obj_in=corpus_in)
+    _id = str(corpus_out.id)
+    async with async_open(f"temp/{_id}.zip", "wb") as file:
         content = await zipfile.read()
-        file.write(content)
-    return {"id": f"{id}"}
+        await file.write(content)
+    return corpus_out
+
+
+@router.get("/{corpus_id}", response_model=schemas.Corpus)
+async def get_corpus(*,
+                     corpus_id: str):
+    return crud.corpus.get(corpus_id)
+
 
 
 @router.post("/{corpus_id}/analysis")
 async def process_corpus(*,
-                         corpus_id: int,
-                         full: bool = True):
+                         corpus_id: str):
     processing = CorpusProcessing(corpus_id)
     await processing.process_corpus()
     return {"status": "ok"}

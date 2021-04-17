@@ -3,7 +3,7 @@ from requests import Response
 import logging
 import aiohttp
 from aiohttp import ClientResponse
-
+from app.core.config import settings
 
 class FileTask:
     def __init__(self, file_path: str, option: str = 'any2txt|wcrft2({"guesser":false, "morfeusz2":true})',
@@ -19,24 +19,23 @@ class FileTask:
         self._file_path = file_path
         self._task_id = None
         self._option: str = option
-        self.logger: logging.Logger = logging.getLogger("FileTask")
 
     async def start_task(self):
         self._remote_filepath = await self._api.upload_zip_file(self._file_path)
         self._option = f"filezip({self._remote_filepath})|" + self._option + "|dir|makezip"
         self._task_id = await (await self._api.start_processing(self._option)).text()
-        self.logger.warning(self._task_id)
+        logging.debug(self._task_id)
 
     async def is_ready(self):
         resp = await self._api.get_task_status(self._task_id)
         body = await resp.json(content_type=None)
         if body['status'] == 'DONE':
             self._progress = 1
-            self.logger.warning(body)
+            logging.debug(body)
             self._download_url = self._get_download_link(body)
             return True
         else:
-            self.logger.warning(body)
+            logging.debug(body)
             self._progress = body["value"]
             return False
 

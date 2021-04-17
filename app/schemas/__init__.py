@@ -1,1 +1,1 @@
-from .corpus import CorpusCreate
+from .corpus import CorpusCreate, Corpus

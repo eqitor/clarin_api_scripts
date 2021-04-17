@@ -1,6 +1,7 @@
-from mongoengine import Document, StringField
+from mongoengine import Document, StringField, ObjectIdField
+from typing import Optional
 
 
 class Corpus(Document):
-    name = StringField()
+    name: str = StringField()
 

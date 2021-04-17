@@ -19,7 +19,6 @@ class PyObjectId(ObjectId):
         field_schema.update(type='string')
 
 
-
 class CorpusBase(BaseModel):
     name: str = "korpus"
 
@@ -28,9 +27,14 @@ class CorpusCreate(CorpusBase):
     name: str = "nazwa_korpusu"
 
 
-
-
 class Corpus(BaseModel):
     id: PyObjectId
     name: Optional[str]
-    files: dict
+    files: Optional[dict]
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
+        json_encoders = {
+            ObjectId: lambda oid: str(oid),
+        }

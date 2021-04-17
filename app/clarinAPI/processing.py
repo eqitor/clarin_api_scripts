@@ -33,7 +33,7 @@ class CorpusProcessing:
             }
     }
 
-    def __init__(self, corpus_id):
+    def __init__(self, corpus_id : str):
         self.corpus_id = corpus_id
         self.zip_path = os.path.join('temp', str(corpus_id) + '.zip')
         if not os.path.isfile(self.zip_path):
