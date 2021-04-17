@@ -2,6 +2,8 @@ from time import sleep
 from app.clarinAPI.TagerAPI import FileTask
 import os
 import asyncio
+from aiohttp.client_exceptions import ServerDisconnectedError
+import logging
 
 
 class CorpusProcessing:
@@ -41,15 +43,19 @@ class CorpusProcessing:
 
     async def process_corpus(self):
         os.makedirs(os.path.join("temp", str(self.corpus_id)), exist_ok=True)
+        timeout = 5
         for tool in self.clarin_tools:
             task = FileTask(self.zip_path, **self.clarin_tools[tool])
             await task.start_task()
-            i = 0
-            while not await task.is_ready():
-                await asyncio.sleep(1)
-                i += 1
-                if i > 600:
-                    raise TimeoutError(f"Corpus is processing too long for clarin tool: {tool}")
+            task_ready = False
+            while not task_ready:
+                try:
+                    task_ready = await task.is_ready()
+                except ServerDisconnectedError as e:
+                    timeout = timeout * 2
+                    logging.error(e.message)
+                    logging.warning(f"timeout set to {timeout}")
+                await asyncio.sleep(timeout)
             else:
                 file = os.path.join("temp", str(self.corpus_id), tool + ".zip")
                 await task.download_and_save_file(out_file=file)
