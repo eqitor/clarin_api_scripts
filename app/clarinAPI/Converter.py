@@ -16,14 +16,32 @@ class Converter:
 
         ortho_list = []
         for tok, base, ctag in zip(toks, bases, ctags):
-            new_dictionary = {
-                'orth': tok.firstChild.data,
-                'base': base.firstChild.data,
-                'ctag': ctag.firstChild.data,
-            }
-            ortho_list.append(new_dictionary)
+            if self.is_ctag_correct(ctag.firstChild.data):
+                new_dictionary = {
+                    'orth': tok.firstChild.data,
+                    'base': base.firstChild.data,
+                    'ctag': ctag.firstChild.data,
+                }
+                ortho_list.append(new_dictionary)
 
         return ortho_list
+
+    def is_ctag_correct(self, ctag):
+        """Checks if given ctag string contains any of fixed tags (noun, adjevtive or adverb)
+        :param ctag: ctag string
+        :returns : True if ctag contains any correct tag
+        """
+        splitted_ctag = ctag.split(":")
+        fixed_tags = [
+            "subst",
+            "adj",
+            "adv",
+        ]
+
+        for tag in splitted_ctag:
+            if tag in fixed_tags:
+                return True
+        return False
 
     def to_json(self, filepath):
         """Converts XML processing data to JSON
