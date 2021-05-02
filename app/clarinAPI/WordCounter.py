@@ -1,6 +1,7 @@
 class WordCounter:
 
-    def count_words(self, dictionary_data):
+    @classmethod
+    def count_words(cls, dictionary_data):
         """Counts words (base words) in given list of dictionaries obtained with Converter
         :param dictionary_data: dictionary data from Converter
         :returns counter_dictionary: dictionary with counted words ('word' : number of occurrences)"""

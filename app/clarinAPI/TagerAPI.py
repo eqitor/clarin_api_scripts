@@ -64,7 +64,8 @@ class FileClarinAPI:
                 "Content-Type": "application/x-zip-compressed"}
         async with aiohttp.ClientSession() as session:
             response = await session.post("http://ws.clarin-pl.eu/nlprest2/base/upload/", data=data)
-        return await response.text()
+            path = await response.text()
+        return path
 
     async def start_processing(self, options='any2txt|wcrft2({"guesser":false, "morfeusz2":true})') -> ClientResponse:
         """Uploads file and starts processing. Returns Response object."""

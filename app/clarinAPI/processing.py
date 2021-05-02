@@ -2,8 +2,13 @@ from time import sleep
 from app.clarinAPI.TagerAPI import FileTask
 import os
 import asyncio
+import json
+from zipfile import ZipFile
+from app.clarinAPI.WordCounter import WordCounter
 from aiohttp.client_exceptions import ServerDisconnectedError
 import logging
+from app.clarinAPI.Converter import Converter
+
 
 
 class CorpusProcessing:
@@ -51,6 +56,7 @@ class CorpusProcessing:
             while not task_ready:
                 try:
                     task_ready = await task.is_ready()
+                    logging.warning(f"czy gotowy:{task.get_progress()}")
                 except ServerDisconnectedError as e:
                     timeout = timeout * 2
                     logging.error(e.message)
@@ -59,3 +65,20 @@ class CorpusProcessing:
             else:
                 file = os.path.join("temp", str(self.corpus_id), tool + ".zip")
                 await task.download_and_save_file(out_file=file)
+                if tool == "tager":
+                    await self.convert_zip(file)
+
+    async def convert_zip(self, zip_file):
+        converter = Converter()
+        zf = ZipFile(zip_file)
+        file_list = zf.namelist()
+        dir_path = os.path.join("temp", self.corpus_id, "tager")
+        os.makedirs(dir_path, exist_ok=True)
+        zf.extractall(dir_path)
+        for file in file_list:
+            path = os.path.join(dir_path, file+"new")
+            with open(path, 'w') as out:
+                filepath = os.path.join(dir_path, file)
+                data = converter.convert(filepath)
+                counted_words = WordCounter.count_words(data)
+                json.dump(counted_words, out)
