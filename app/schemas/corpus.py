@@ -25,6 +25,7 @@ class CorpusBase(BaseModel):
 
 class CorpusCreate(CorpusBase):
     name: str = "nazwa_korpusu"
+    files: dict = None
 
 
 class Corpus(BaseModel):
