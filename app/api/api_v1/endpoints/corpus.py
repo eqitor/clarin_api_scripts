@@ -17,15 +17,14 @@ async def create_corpus(*,
                         corpus_name: str = Form(default="Korpus"),
                         background_tasks: BackgroundTasks
                         ) -> schemas.Corpus:
-    with open(f"temp/{corpus_name}.json", "wb") as md:
-        data = await metadata.read()
-        md.write(data)
-    with open(f"temp/{corpus_name}.json", "r") as md:
-        metadata_dict = json.load(md)
+    json_data = await metadata.read()
+    metadata_dict = json.loads(json_data)
+
     corpus_in = schemas.CorpusCreate(name=corpus_name,
                                      files=metadata_dict)
     corpus_out = crud.corpus.create(obj_in=corpus_in)
     _id = str(corpus_out.id)
+
     async with async_open(f"temp/{_id}.zip", "wb") as file:
         content = await zipfile.read()
         await file.write(content)

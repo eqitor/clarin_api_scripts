@@ -14,5 +14,3 @@ async def get_tager_analysis(*,
                      corpus_id: str):
     ta = TagerAnalysis(corpus_id)
     return ta.get_analysis()
-
-
