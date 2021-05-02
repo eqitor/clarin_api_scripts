@@ -2,23 +2,17 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Background
 from app import schemas,crud
 from app.clarinAPI.processing import CorpusProcessing
 from aiofile import async_open
+from app.clarinAPI.analysis import TagerAnalysis
 
 router = APIRouter()
 
 
 
 
-@router.get("/", response_model=schemas.Corpus)
-async def get_corpus(*,
-                     corpus_id: str,
-                     tager: bool):
-    return crud.corpus.get(corpus_id)
+@router.get("/tager")
+async def get_tager_analysis(*,
+                     corpus_id: str):
+    ta = TagerAnalysis(corpus_id)
+    return ta.get_analysis()
 
-
-@router.post("/{corpus_id}/analysis")
-async def process_corpus(*,
-                         corpus_id: str):
-    processing = CorpusProcessing(corpus_id)
-    await processing.process_corpus()
-    return {"status": "ok"}
 

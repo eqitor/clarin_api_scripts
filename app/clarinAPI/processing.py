@@ -76,7 +76,7 @@ class CorpusProcessing:
         os.makedirs(dir_path, exist_ok=True)
         zf.extractall(dir_path)
         for file in file_list:
-            path = os.path.join(dir_path, file+"new")
+            path = os.path.join(dir_path, file[:-4])
             with open(path, 'w') as out:
                 filepath = os.path.join(dir_path, file)
                 data = converter.convert(filepath)
