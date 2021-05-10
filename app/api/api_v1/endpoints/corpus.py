@@ -6,6 +6,7 @@ from aiofile import async_open
 from random import randint
 import logging
 import json
+import os
 
 router = APIRouter()
 
@@ -25,7 +26,8 @@ async def create_corpus(*,
     corpus_out = crud.corpus.create(obj_in=corpus_in)
     _id = str(corpus_out.id)
 
-    async with async_open(f"temp/{_id}.zip", "wb") as file:
+    os.makedirs("temp", exist_ok=True)
+    async with async_open(os.path.join("temp", f"{_id}.zip"), "wb") as file:
         content = await zipfile.read()
         await file.write(content)
     processing = CorpusProcessing(_id)
@@ -37,12 +39,3 @@ async def create_corpus(*,
 async def get_corpus(*,
                      corpus_id: str):
     return crud.corpus.get(corpus_id)
-
-
-@router.post("/{corpus_id}/analysis")
-async def process_corpus(*,
-                         corpus_id: str):
-    processing = CorpusProcessing(corpus_id)
-    await processing.process_corpus()
-    return {"status": "ok"}
-

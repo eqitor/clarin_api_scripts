@@ -27,7 +27,7 @@ class FileTask:
     async def start_task(self):
         self._remote_filepath = await self._api.upload_zip_file(self._file_path)
         self._option = f"filezip({self._remote_filepath})|" + self._option + "|dir|makezip"
-        self._task_id = await (await self._api.start_processing(self._option)).text()
+        self._task_id = await self._api.start_processing(self._option)
         logging.warning(self._task_id)
 
     async def is_ready(self):
@@ -67,7 +67,7 @@ class FileClarinAPI:
             path = await response.text()
         return path
 
-    async def start_processing(self, options='any2txt|wcrft2({"guesser":false, "morfeusz2":true})') -> ClientResponse:
+    async def start_processing(self, options='any2txt|wcrft2({"guesser":false, "morfeusz2":true})') -> str:
         """Uploads file and starts processing. Returns Response object."""
         url = r"http://ws.clarin-pl.eu/nlprest2/base/startTask"
 
@@ -78,7 +78,8 @@ class FileClarinAPI:
         }
         async with aiohttp.ClientSession() as session:
             response = await session.post(url, json=body)
-        return response
+            task_id = await response.text()
+        return task_id
 
     async def get_task_status(self, task) -> dict:
         """Checks status of uploaded task."""

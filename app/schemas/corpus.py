@@ -21,10 +21,10 @@ class PyObjectId(ObjectId):
 
 class CorpusBase(BaseModel):
     name: str = "korpus"
+    status: str = "PROCESSING"
 
 
 class CorpusCreate(CorpusBase):
-    name: str = "nazwa_korpusu"
     files: dict = None
 
 
@@ -32,6 +32,7 @@ class Corpus(BaseModel):
     id: PyObjectId
     name: Optional[str]
     files: Optional[dict]
+    status: str
 
     class Config:
         orm_mode = True

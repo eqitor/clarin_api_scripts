@@ -8,6 +8,7 @@ from app.clarinAPI.WordCounter import WordCounter
 from aiohttp.client_exceptions import ServerDisconnectedError
 import logging
 from app.clarinAPI.Converter import Converter
+from app.crud import corpus
 
 
 
@@ -65,8 +66,11 @@ class CorpusProcessing:
             else:
                 file = os.path.join("temp", str(self.corpus_id), tool + ".zip")
                 await task.download_and_save_file(out_file=file)
+                logging.warning(f"{tool} completed for corpus {self.corpus_id}")
                 if tool == "tager":
                     await self.convert_zip(file)
+        else:
+            corpus.set_status(self.corpus_id, "READY")
 
     async def convert_zip(self, zip_file):
         converter = Converter()

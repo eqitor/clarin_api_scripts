@@ -26,5 +26,8 @@ class CRUDCorpus:
         obj_out = Corpus.objects(name=name).first()
         return obj_out
 
+    def set_status(self, id:str, status:str) -> None:
+        corpus = self.get(id)
+        corpus.update(status=status)
 
 corpus = CRUDCorpus()
