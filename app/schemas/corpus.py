@@ -28,6 +28,16 @@ class CorpusCreate(CorpusBase):
     files: dict = None
 
 
+class CorpusOut(CorpusBase):
+    id: PyObjectId
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
+        json_encoders = {
+            ObjectId: lambda oid: str(oid),
+        }
+
 class Corpus(BaseModel):
     id: PyObjectId
     name: Optional[str]
