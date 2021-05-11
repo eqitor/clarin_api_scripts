@@ -7,6 +7,7 @@ from random import randint
 import logging
 import json
 import os
+from app.clarinAPI.filtering import Filtering
 
 router = APIRouter()
 
@@ -37,6 +38,9 @@ async def create_corpus(*,
         name=corpus.name,
         status=corpus.status
     )
+    filtr = Filtering()
+    filters = filtr.get_filters_schema_from_dict(metadata_dict)
+    logging.warning(filters)
     return corpus_out
 
 
