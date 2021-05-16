@@ -8,3 +8,7 @@
 
 ### Shutdown docker-compose
 `docker-compose down`
+
+## Backend usage
+Endpoints with descriptions are available at:
+`127.0.0.1/docs`
