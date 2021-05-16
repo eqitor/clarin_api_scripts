@@ -8,7 +8,7 @@ class WordCounter:
         counter_dictionary = {}
         for single_dictionary in dictionary_data:
             try:
-                counter_dictionary[single_dictionary['base']] += 1
+                counter_dictionary[(single_dictionary['base'], single_dictionary['ctag'])] += 1
             except KeyError:
-                counter_dictionary[single_dictionary['base']] = 1
+                counter_dictionary[(single_dictionary['base'], single_dictionary['ctag'])] = 1
         return counter_dictionary
