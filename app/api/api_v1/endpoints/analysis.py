@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Background
 from app import schemas,crud
 from app.clarinAPI.processing import CorpusProcessing
 from aiofile import async_open
-from app.clarinAPI.analysis import TagerAnalysis
+from app.clarinAPI.analysis import TagerAnalysis, NerAnalysis
 
 router = APIRouter()
 
@@ -19,3 +19,10 @@ async def get_tager_analysis(*,
                      limit: int = None):
     ta = TagerAnalysis(corpus_id)
     return ta.get_analysis(ctags, limit)
+
+@router.post("/ner")
+async def get_ner_analysis(*,
+                     corpus_id: str,
+                     limit: int = None):
+    na = NerAnalysis(corpus_id)
+    return na.get_analysis(limit)

@@ -11,7 +11,7 @@ class NerAnalyzer:
         mydoc = minidom.parse(filepath)
         toks = mydoc.getElementsByTagName('tok')
 
-        names_list = []
+        ner_dict = {}
         for tok in toks:
             orth = tok.getElementsByTagName('orth')
             anns = tok.getElementsByTagName('ann')
@@ -19,17 +19,22 @@ class NerAnalyzer:
             ctags = tok.getElementsByTagName('ctag')
             if anns:
                 if anns[0].firstChild.data == '1':
-                    unique = True
-                else:
-                    unique = False
-                names_list.append({
-                    'word': orth[0].firstChild.data,
-                    'original': bases[0].firstChild.data,
-                    'category': anns[0].getAttribute('chan'),
-                    'unique': unique,
-                    'speech': self.create_speech_list(ctags[0].firstChild.data)
-                })
-        return names_list
+                    base = bases[0].firstChild.data
+                    word = orth[0].firstChild.data
+                    if base in ner_dict:
+                        if word not in ner_dict[base]['word']:
+                            ner_dict[base]['word'] += [word]
+                        ner_dict[base]['speech'] += self.create_speech_list(ctags[0].firstChild.data)
+                        ner_dict[base]['count'] += 1
+                    else:
+                        ner_dict[base] = {
+                            'word': [word],
+                            'base': base,
+                            'category': anns[0].getAttribute('chan'),
+                            'speech': self.create_speech_list(ctags[0].firstChild.data),
+                            'count': 1
+                        }
+        return ner_dict
 
     def create_speech_list(self, ctag):
         """Takes ctag and returns splitted list with types
@@ -37,3 +42,5 @@ class NerAnalyzer:
         :returns splitted_list: list of ctag types"""
         splitted_list = ctag.split(':')
         return splitted_list
+
+

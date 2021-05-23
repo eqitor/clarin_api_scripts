@@ -9,7 +9,7 @@ from aiohttp.client_exceptions import ServerDisconnectedError
 import logging
 from app.clarinAPI.Converter import Converter
 from app.crud import corpus
-
+from app.clarinAPI.NerAnalyzer import NerAnalyzer
 
 
 class CorpusProcessing:
@@ -68,11 +68,13 @@ class CorpusProcessing:
                 await task.download_and_save_file(out_file=file)
                 logging.warning(f"{tool} completed for corpus {self.corpus_id}")
                 if tool == "tager":
-                    await self.convert_zip(file)
+                    await self.convert_zip_tagger(file)
+                if tool == "ner":
+                    await self.convert_zip_ner(file)
         else:
             corpus.set_status(self.corpus_id, "READY")
 
-    async def convert_zip(self, zip_file):
+    async def convert_zip_tagger(self, zip_file):
         converter = Converter()
         zf = ZipFile(zip_file)
         file_list = zf.namelist()
@@ -86,3 +88,19 @@ class CorpusProcessing:
                 data = converter.convert(filepath)
                 counted_words = WordCounter.count_words(data)
                 json.dump(counted_words, out)
+
+
+    async def convert_zip_ner(self, zip_file):
+        zf = ZipFile(zip_file)
+        file_list = zf.namelist()
+        dir_path = os.path.join("temp", self.corpus_id, "ner")
+        os.makedirs(dir_path, exist_ok=True)
+        zf.extractall(dir_path)
+        analyzer = NerAnalyzer()
+        for file in file_list:
+            path = os.path.join(dir_path, file[:-4])
+            with open(path, 'w') as out:
+                filepath = os.path.join(dir_path, file)
+                ner_dict = analyzer.find_names(filepath)
+                json.dump(ner_dict, out)
+
