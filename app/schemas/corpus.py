@@ -22,6 +22,7 @@ class PyObjectId(ObjectId):
 class CorpusBase(BaseModel):
     name: str = "korpus"
     status: str = "PROCESSING"
+    filters: dict
 
 
 class CorpusCreate(CorpusBase):
@@ -43,6 +44,7 @@ class Corpus(BaseModel):
     name: Optional[str]
     files: Optional[dict]
     status: str
+    filters: Optional[dict]
 
     class Config:
         orm_mode = True

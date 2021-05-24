@@ -3,7 +3,9 @@ from typing import Any
 from app import schemas,crud
 from app.clarinAPI.processing import CorpusProcessing
 from aiofile import async_open
+from copy import deepcopy
 from random import randint
+from mongoengine.base.datastructures import BaseList, BaseDict
 import logging
 import json
 import os
@@ -21,9 +23,11 @@ async def create_corpus(*,
                         ) -> schemas.CorpusOut:
     json_data = await metadata.read()
     metadata_dict = json.loads(json_data)
-
+    filtr = Filtering()
+    filters = filtr.get_filters_schema_from_dict(metadata_dict)
     corpus_in = schemas.CorpusCreate(name=corpus_name,
-                                     files=metadata_dict)
+                                     files=metadata_dict,
+                                     filters=filters)
     corpus = crud.corpus.create(obj_in=corpus_in)
     _id = str(corpus.id)
 
@@ -33,13 +37,14 @@ async def create_corpus(*,
         await file.write(content)
     processing = CorpusProcessing(_id)
     background_tasks.add_task(processing.process_corpus)
+
     corpus_out = schemas.CorpusOut(
         id=corpus.id,
         name=corpus.name,
-        status=corpus.status
+        status=corpus.status,
+        filters=corpus.filters
     )
-    filtr = Filtering()
-    filters = filtr.get_filters_schema_from_dict(metadata_dict)
+
     logging.warning(filters)
     return corpus_out
 
@@ -48,12 +53,23 @@ async def create_corpus(*,
 async def get_corpus(*,
                      corpus_id: str):
     corpus = crud.corpus.get(corpus_id)
+    logging.warning(type(corpus.filters))
     corpus_out = schemas.CorpusOut(
         id=corpus.id,
         name=corpus.name,
-        status=corpus.status
+        status=corpus.status,
+        filters=convert_basedict_to_dict(corpus.filters)
     )
     return corpus_out
+
+def convert_basedict_to_dict(d: BaseDict):
+    d = dict(d)
+    for key, value in d.items():
+        if type(value) is BaseList:
+            d[key] = list(value)
+        elif type(value) is BaseDict or type(value) is dict:
+            d[key] = convert_base_dict_to_dict(d[key])
+    return d
 
 @router.get("/{corpus_id}/list")
 async def get_corpus(*,

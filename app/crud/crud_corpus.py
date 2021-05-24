@@ -10,7 +10,8 @@ class CRUDCorpus:
         logging.warning(obj_in)
         db_obj = Corpus(
             name=obj_in.name,
-            files=obj_in.files
+            files=obj_in.files,
+            filters=obj_in.filters
         )
         db_obj = db_obj.save()
         logging.warning(str(db_obj.id))

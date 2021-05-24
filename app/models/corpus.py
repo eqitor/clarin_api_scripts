@@ -6,3 +6,4 @@ class Corpus(Document):
     name: str = StringField()
     files: dict = DictField()
     status: str = StringField(default="PROCESSING")
+    filters: dict = DictField()
