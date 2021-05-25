@@ -2,6 +2,24 @@
 
 class Filtering:
 
+
+    def get_list_of_files_for_filters(self,metadata:dict, boundaries:dict):
+        result = metadata
+        for filter in boundaries:
+            if boundaries[filter]["type"] == "date":
+                #TODO date filtering
+                pass
+            elif boundaries[filter]["type"] == "string":
+                result = {k: v for k, v in result.items()
+                          if v[filter] in boundaries[filter]["domain"]}
+            elif boundaries[filter]["type"] == "float":
+                result = {k: v for k, v in result.items()
+                          if boundaries[filter]["last"] >= v[filter] >= boundaries[filter]["first"]}
+            elif boundaries[filter]["type"] == "integer":
+                result = {k: v for k, v in result.items()
+                          if boundaries[filter]["last"] >= v[filter] >= boundaries[filter]["first"]}
+        return result.keys()
+
     def get_filters_schema_from_dict(self, metadata: dict) -> dict:
         example = list(metadata.values())[0]
         filters = {}

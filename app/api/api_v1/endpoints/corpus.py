@@ -42,7 +42,7 @@ async def create_corpus(*,
         id=corpus.id,
         name=corpus.name,
         status=corpus.status,
-        filters=corpus.filters
+        filters=convert_basedict_to_dict(corpus.filters)
     )
 
     logging.warning(filters)
@@ -68,7 +68,7 @@ def convert_basedict_to_dict(d: BaseDict):
         if type(value) is BaseList:
             d[key] = list(value)
         elif type(value) is BaseDict or type(value) is dict:
-            d[key] = convert_base_dict_to_dict(d[key])
+            d[key] = convert_basedict_to_dict(d[key])
     return d
 
 @router.get("/{corpus_id}/list")
