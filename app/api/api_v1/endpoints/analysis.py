@@ -1,10 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Form, BackgroundTasks
 from app import schemas, crud
-from app.clarinAPI.analysis import TagerAnalysis, NerAnalysis, Analysis, NerAnalysis_2, TagerAnalysis_2
+from app.clarinAPI.analysis import TagerAnalysis, NerAnalysis, Analysis
 import logging
-from mongoengine.base.datastructures import BaseList,BaseDict
-router = APIRouter()
+from mongoengine.base.datastructures import BaseList, BaseDict
 
+router = APIRouter()
 
 
 @router.post("/", response_model=schemas.AnalysisOut)
@@ -28,8 +28,25 @@ async def create_analysis(*,
         options=analysis_obj.options,
         files=analysis_obj.files
     )
-    #TODO zmienic ListBase na list
+    # TODO zmienic ListBase na list
     return analysis_out
+
+
+@router.get("/{analysis_id}/ner")
+async def get_ner_analysis(*,
+                            analysis_id: str,
+                            limit: int = None):
+    na = NerAnalysis(analysis_id)
+    return na.get_analysis(limit)
+
+
+@router.get("/{analysis_id}/tager")
+async def get_tager_analysis(*,
+                              analysis_id: str,
+                              limit: int = None):
+    ta = TagerAnalysis(analysis_id)
+    return ta.get_analysis(limit)
+
 
 def convert_basedict_to_dict(d: BaseDict):
     d = dict(d)
@@ -39,35 +56,3 @@ def convert_basedict_to_dict(d: BaseDict):
         elif type(value) is BaseDict or type(value) is dict:
             d[key] = convert_basedict_to_dict(d[key])
     return d
-
-
-@router.post("/tager")
-async def get_tager_analysis(*,
-                     corpus_id: str,
-                     ctags: list,
-                     limit: int = None):
-    ta = TagerAnalysis(corpus_id)
-    return ta.get_analysis(ctags, limit)
-
-@router.get("/{analysis_id}/ner")
-async def get_ner_analysis2(*,
-                     analysis_id: str,
-                     limit: int = None):
-    na = NerAnalysis_2(analysis_id)
-    return na.get_analysis(limit)
-
-@router.post("/{analysis_id}/tager")
-async def get_tager_analysis2(*,
-                     analysis_id: str,
-                     limit: int = None):
-    ta = TagerAnalysis_2(analysis_id)
-    return ta.get_analysis(limit)
-
-
-
-@router.post("/ner")
-async def get_ner_analysis(*,
-                     corpus_id: str,
-                     limit: int = None):
-    na = NerAnalysis(corpus_id)
-    return na.get_analysis(limit)

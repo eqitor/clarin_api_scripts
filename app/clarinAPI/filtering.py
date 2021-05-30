@@ -3,19 +3,19 @@
 class Filtering:
 
 
-    def get_list_of_files_for_filters(self,metadata:dict, boundaries:dict):
+    def get_list_of_files_for_filters(self,metadata:dict, boundaries:dict, filters:dict):
         result = metadata
         for filter in boundaries:
-            if boundaries[filter]["type"] == "date":
+            if filters[filter]["type"] == "date":
                 #TODO date filtering
                 pass
-            elif boundaries[filter]["type"] == "string":
+            elif filters[filter]["type"] == "string":
                 result = {k: v for k, v in result.items()
                           if v[filter] in boundaries[filter]["domain"]}
-            elif boundaries[filter]["type"] == "float":
+            elif filters[filter]["type"] == "float":
                 result = {k: v for k, v in result.items()
                           if boundaries[filter]["last"] >= v[filter] >= boundaries[filter]["first"]}
-            elif boundaries[filter]["type"] == "integer":
+            elif filters[filter]["type"] == "integer":
                 result = {k: v for k, v in result.items()
                           if boundaries[filter]["last"] >= v[filter] >= boundaries[filter]["first"]}
         return result.keys()
@@ -57,9 +57,6 @@ class Filtering:
                     elif filter_data["last"] < descr[filter]:
                         filter_data["last"] = descr[filter]
         return filters
-
-    def get_files_for_filters(self, filters: dict, filters_schema: dict) -> dict:
-        pass
 
     def _is_date(self, value) -> bool:
         # TODO dates are not implemented yet
