@@ -34,16 +34,16 @@ async def create_analysis(*,
 
 @router.get("/{analysis_id}/ner")
 async def get_ner_analysis(*,
-                            analysis_id: str,
-                            limit: int = None):
+                           analysis_id: str,
+                           limit: int = None):
     na = NerAnalysis(analysis_id)
     return na.get_analysis(limit)
 
 
 @router.get("/{analysis_id}/tager")
 async def get_tager_analysis(*,
-                              analysis_id: str,
-                              limit: int = None):
+                             analysis_id: str,
+                             limit: int = None):
     ta = TagerAnalysis(analysis_id)
     return ta.get_analysis(limit)
 

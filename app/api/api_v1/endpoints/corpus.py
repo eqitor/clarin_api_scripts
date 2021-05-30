@@ -24,7 +24,7 @@ async def create_corpus(*,
     json_data = await metadata.read()
     metadata_dict = json.loads(json_data)
     filtr = Filtering()
-    filters = filtr.get_filters_schema_from_dict(metadata_dict)
+    filters = filtr.get_filters_schema_from_dict_and_convert_dates(metadata_dict)
     corpus_in = schemas.CorpusCreate(name=corpus_name,
                                      files=metadata_dict,
                                      filters=filters)
