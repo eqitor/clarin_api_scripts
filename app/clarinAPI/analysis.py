@@ -15,8 +15,18 @@ class Analysis:
         self.files = filtr.get_list_of_files_for_filters(self.metadata, boundaries, self.corpus.filters)
         crud.analysis.set_files(self.analysis_id, self.files)
 
-    def start_analysis(self, options):
-        pass
+    async def start_analysis(self):
+        logging.warning("Analysis is not DONE")
+        ta = TagerAnalysis(self.analysis_id)
+        tagger = ta.get_analysis()
+        na = NerAnalysis(self.analysis_id)
+        ner = na.get_analysis()
+        result = {"tagger": tagger, "ner": ner}
+        logging.warning("Analysis is DONE0")
+        crud.analysis.set_result(self.analysis_id, result)
+        logging.warning("Analysis is DONE1")
+        crud.analysis.set_status(self.analysis_id, "DONE")
+        logging.warning("Analysis is DONE2")
 
 
 class TagerAnalysis:
@@ -37,7 +47,6 @@ class TagerAnalysis:
             path = os.path.join("temp", self.corpus_id, "tager", file)
             with open(path, "r") as f:
                 data = json.load(f)
-                logging.warning(data)
                 for word in data:
                     try:
                         analysis_dict[word] += data[word]
@@ -84,7 +93,6 @@ class NerAnalysis:
             path = os.path.join("temp", self.corpus_id, "ner", file)
             with open(path, "r") as f:
                 data = json.load(f)
-                logging.warning(data)
                 self._merge_ner_dicts(data, analysis_dict)
         analysis_list = list(analysis_dict.values())
         sorted_list = sorted(analysis_list, key=itemgetter('count'), reverse=True)

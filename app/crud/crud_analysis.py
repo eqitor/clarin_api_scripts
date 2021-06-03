@@ -4,7 +4,7 @@ from app import schemas
 from typing import Optional
 import logging
 
-class CRUDCorpus:
+class CRUDAnalysis:
 
     def create(self, obj_in: AnalysisCreate) -> schemas.Analysis:
         logging.warning(obj_in)
@@ -31,5 +31,9 @@ class CRUDCorpus:
         analysis = self.get(id)
         analysis.update(files=files)
 
+    def set_result(self, id:str, result: dict) -> None:
+        analysis = self.get(id)
+        analysis.update(result=result)
 
-analysis = CRUDCorpus()
+
+analysis = CRUDAnalysis()

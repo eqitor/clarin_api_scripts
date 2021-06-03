@@ -8,3 +8,4 @@ class Analysis(Document):
     boundaries: dict = DictField()
     options: dict = DictField()
     corpus_id: str = StringField()
+    result: dict = DictField()

@@ -32,6 +32,7 @@ class AnalysisCreate(AnalysisBase):
 
 class AnalysisOut(AnalysisBase):
     id: PyObjectId
+    result: dict
 
     class Config:
         orm_mode = True
@@ -48,6 +49,7 @@ class Analysis(BaseModel):
     boundaries: dict
     options: dict
     corpus_id: str
+    result: dict
 
     class Config:
         orm_mode = True
