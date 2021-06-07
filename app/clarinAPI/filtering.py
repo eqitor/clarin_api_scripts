@@ -79,7 +79,8 @@ class Filtering:
 
     def convert_to_datetime(self,date:str) -> datetime:
         pi = parserinfo(yearfirst=True)
-        return parse(date, parserinfo=pi)
+
+        return parse(date, parserinfo=pi).replace(tzinfo=None)
 
 
     def _is_date(self, value) -> bool:
