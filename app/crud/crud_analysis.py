@@ -30,6 +30,7 @@ class CRUDAnalysis:
     def set_files(self, id:str, files: list) -> None:
         analysis = self.get(id)
         analysis.update(files=files)
+        analysis.update(files_count=len(files))
 
     def set_result(self, id:str, result: dict) -> None:
         analysis = self.get(id)

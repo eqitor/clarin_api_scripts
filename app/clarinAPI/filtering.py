@@ -1,11 +1,14 @@
 from datetime import datetime
+from typing import Optional
 from dateutil.parser import parse, parserinfo
 import logging
 class Filtering:
 
 
-    def get_list_of_files_for_filters(self,metadata:dict, boundaries:dict, filters:dict):
+    def get_list_of_files_for_filters(self,metadata:dict, boundaries:Optional[dict], filters:dict):
         result = metadata
+        if boundaries is None:
+            boundaries = {}
         for filter in boundaries:
             if filters[filter]["type"] == "date":
                 converted_last = self.convert_to_datetime(boundaries[filter]["last"])
@@ -79,7 +82,6 @@ class Filtering:
 
     def convert_to_datetime(self,date:str) -> datetime:
         pi = parserinfo(yearfirst=True)
-
         return parse(date, parserinfo=pi).replace(tzinfo=None)
 
 

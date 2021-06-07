@@ -3,6 +3,7 @@ from app import schemas, crud
 from app.clarinAPI.analysis import TagerAnalysis, NerAnalysis, Analysis
 import logging
 from mongoengine.base.datastructures import BaseList, BaseDict
+from typing import Optional
 
 router = APIRouter()
 
@@ -10,8 +11,8 @@ router = APIRouter()
 @router.post("/", response_model=schemas.AnalysisOut)
 async def create_analysis(*,
                           corpus_id: str,
-                          filter_boundaries: dict,
-                          options: dict,
+                          filter_boundaries: Optional[dict] = None,
+                          options: Optional[dict] = None,
                           background_tasks: BackgroundTasks):
     analysis_in = schemas.AnalysisCreate(
         boundaries=filter_boundaries,
@@ -29,6 +30,7 @@ async def create_analysis(*,
         corpus_id=analysis_obj.corpus_id,
         options=analysis_obj.options,
         files=analysis_obj.files,
+        files_count=analysis_obj.files_count,
         result=convert_basedict_to_dict(analysis_obj.result)
     )
     # TODO zmienic ListBase na list
@@ -46,6 +48,7 @@ async def get_analysis(*,
         corpus_id=analysis_obj.corpus_id,
         options=convert_basedict_to_dict(analysis_obj.options),
         files=convert_basedict_to_dict(analysis_obj.files),
+        files_count=analysis_obj.files_count,
         result=convert_basedict_to_dict(analysis_obj.result)
     )
     return analysis_out

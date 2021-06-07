@@ -21,9 +21,9 @@ class PyObjectId(ObjectId):
 
 class AnalysisBase(BaseModel):
     status: str = "PROCESSING"
-    boundaries: dict
+    boundaries: Optional[dict]
     corpus_id: str
-    options: dict
+    options: Optional[dict]
 
 
 class AnalysisCreate(AnalysisBase):
@@ -32,6 +32,7 @@ class AnalysisCreate(AnalysisBase):
 
 class AnalysisOut(AnalysisBase):
     id: PyObjectId
+    files_count: Optional[int]
     result: dict
 
     class Config:
@@ -45,9 +46,10 @@ class AnalysisOut(AnalysisBase):
 class Analysis(BaseModel):
     id: PyObjectId
     files: Optional[list]
+    files_count: Optional[int]
     status: str
-    boundaries: dict
-    options: dict
+    boundaries: Optional[dict]
+    options: Optional[dict]
     corpus_id: str
     result: dict
 
