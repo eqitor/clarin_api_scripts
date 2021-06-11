@@ -4,7 +4,7 @@
 `docker-compose up --build
 `
 ### Run tests from test directory
-`docker exec backend-master_backend_1 ./tests-start.sh`
+`docker exec clarin_api_scripts_backend_1 pytest`
 
 ### Shutdown docker-compose
 `docker-compose down`

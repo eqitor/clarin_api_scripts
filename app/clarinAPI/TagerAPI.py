@@ -28,13 +28,11 @@ class FileTask:
         self._remote_filepath = await self._api.upload_zip_file(self._file_path)
         self._option = f"filezip({self._remote_filepath})|" + self._option + "|dir|makezip"
         self._task_id = await self._api.start_processing(self._option)
-        logging.warning(self._task_id)
 
     async def is_ready(self):
         body = await self._api.get_task_status(self._task_id)
         if body['status'] == 'DONE':
             self._progress = 1
-            logging.warning(body)
             self._download_url = self._get_download_link(body)
             return True
         else:

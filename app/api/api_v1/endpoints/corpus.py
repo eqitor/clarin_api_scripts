@@ -44,8 +44,6 @@ async def create_corpus(*,
         status=corpus.status,
         filters=convert_basedict_to_dict(corpus.filters)
     )
-
-    logging.warning(filters)
     return corpus_out
 
 
@@ -53,7 +51,6 @@ async def create_corpus(*,
 async def get_corpus(*,
                      corpus_id: str):
     corpus = crud.corpus.get(corpus_id)
-    logging.warning(type(corpus.filters))
     corpus_out = schemas.CorpusOut(
         id=corpus.id,
         name=corpus.name,

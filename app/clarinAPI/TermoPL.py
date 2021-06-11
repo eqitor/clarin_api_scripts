@@ -17,18 +17,14 @@ class TermoPL:
         for row in self.table:
             data_list.append(
                 {
-                    'id': int(row[0]),
-                    'word': row[2],
+                    'word': row[2].split(" "),
                     'original': self.remove_brackets(row[3]),
                     'rank': int(row[1]),
                     'cvalue': float(row[4]),
-                    'freq_s': int(row[6]),
-                    'freq_in': int(row[7]),
-                    'context': int(row[8]),
-                    'lenght': int(row[5])
+                    'length': int(row[5])
                 }
             )
         return data_list
 
-    def remove_brackets(self, cell):
+    def remove_brackets(self, cell) -> str:
         return cell[1:-1]

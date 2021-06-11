@@ -16,17 +16,15 @@ class Analysis:
         crud.analysis.set_files(self.analysis_id, self.files)
 
     async def start_analysis(self):
-        logging.warning("Analysis is not DONE")
         ta = TagerAnalysis(self.analysis_id)
         tagger = ta.get_analysis()
         na = NerAnalysis(self.analysis_id)
         ner = na.get_analysis()
-        result = {"tagger": tagger, "ner": ner}
-        logging.warning("Analysis is DONE0")
+        tpla = TermoPLAnalysis(self.analysis_id)
+        termopl = tpla.get_analysis()
+        result = {"tagger": tagger, "ner": ner, "termopl": termopl}
         crud.analysis.set_result(self.analysis_id, result)
-        logging.warning("Analysis is DONE1")
         crud.analysis.set_status(self.analysis_id, "DONE")
-        logging.warning("Analysis is DONE2")
 
 
 class TagerAnalysis:
@@ -111,3 +109,28 @@ class NerAnalysis:
             else:
                 dict_to[base] = dict_from[base]
         return dict_to
+
+class TermoPLAnalysis:
+
+    def __init__(self, analysis_id: str):
+        self.analysis = crud.analysis.get(analysis_id)
+        self.corpus_id = self.analysis.corpus_id
+        self.files = self.analysis.files
+
+    def get_analysis(self,  limit=None):
+        analysis_dict = {}
+        for file in self.files:
+            path = os.path.join("temp", self.corpus_id, "termopl", file)
+            with open(path, "r") as f:
+                data = json.load(f)
+                for termopl in data:
+                    try:
+                        analysis_dict[termopl]['count'] += data[termopl]['count']
+                    except KeyError:
+                        analysis_dict[termopl] = data[termopl]
+        analysis_list = list(analysis_dict.values())
+        sorted_list = sorted(analysis_list, key=itemgetter('count'), reverse=True)
+        if limit is None:
+            return sorted_list
+        else:
+            return sorted_list[:limit]
